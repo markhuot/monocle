@@ -8,11 +8,11 @@ REPO="$1"; REV="$2"; APP_NAME="$3"; BRANCH="$4";
 
 TMP_WORK_DIR=$(mktemp -d)
 ./git-clone $REPO $REV $TMP_WORK_DIR
-# if [[ -e "$TMP_WORK_DIR/Stackfile" ]]; do
-# 	stackfile=$(cat "$TMP_WORK_DIR/Stackfile")
-# else
+if [[ -e "$TMP_WORK_DIR/Stackfile" ]]; do
+	stackfile=$(cat "$TMP_WORK_DIR/Stackfile")
+else
 	stackfile="[web]\nimage=progrium/buildstep\ncmd=/build/builder\nmountPoint=/app"
-# fi
+fi
 for container in $(echo $stackfile | ./ini2arr.py --containers); do
 	echo "-----> Building $container"
 	IMAGE=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container image)
