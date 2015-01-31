@@ -1,0 +1,6 @@
+#!/bin/bash
+set -eo pipefail
+#shopt -s nullglob
+
+REPO="$1"; REV="$2"; TMP_WORK_DIR="$3"
+

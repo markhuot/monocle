@@ -1,0 +1,9 @@
+#!/bin/bash
+set -eo pipefail
+#shopt -s nullglob
+
+TMP_WORK_DIR="$1"
+
+pushd $TMP_WORK_DIR > /dev/null
+find -name .git -prune -exec rm -rf {} \; > /dev/null
+tar c .

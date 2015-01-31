@@ -10,11 +10,13 @@ role-builder
 
 1. grab from "to-build" queue
 2. clone (`./git-clone REPO_URL REV`)
-4. buildstep (`./buildstep APP_NAME BRANCH`)
-5. add ENV (`./docker-env APP_NAME BRANCH`)
-6. docker export container (or docker save image) > image.tar.gz (`.docker-save APP_NAME BRANCH > app.tar.gz`)
-7. cleanup (`./cleanup`)
-7. add to "to-run" queue...
+3. parse Stackfile
+	4. archive (`./archive PATH`)
+	4. buildstep (`./buildstep APP_NAME BRANCH`)
+	5. add ENV (`./docker-env APP_NAME BRANCH`)
+	6. docker export container (or docker save image) > image.tar.gz (`.docker-save APP_NAME BRANCH > app.tar.gz`)
+	7. cleanup (`./cleanup`)
+	8. add to "to-run" queue...
 
 e.g. `./git-clone /vagrant/debug/repo.git HEAD | ./buildstep repo master | ./docker-env repo master | ./docker-save repo master > test.tar.gz | ./cleanup`
 

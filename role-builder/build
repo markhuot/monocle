@@ -1,0 +1,24 @@
+#!/bin/bash
+set -eo pipefail
+#shopt -s nullglob
+
+# e.g. ./build /vagrant/debug/repo.git HEAD repo master
+
+REPO="$1"; REV="$2"; APP_NAME="$3"; BRANCH="$4";
+
+TMP_WORK_DIR=$(mktemp -d)
+./git-clone $REPO $REV $TMP_WORK_DIR
+# if [[ -e "$TMP_WORK_DIR/Stackfile" ]]; do
+# 	stackfile=$(cat "$TMP_WORK_DIR/Stackfile")
+# else
+	stackfile="[web]\nimage=progrium/buildstep\ncmd=/build/builder\nmountPoint=/app"
+# fi
+for container in $(echo $stackfile | ./ini2arr.py --containers); do
+	echo "-----> Building $container"
+	IMAGE=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container image)
+	CMD=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container cmd)
+	./archive $TMP_WORK_DIR | ./buildstep $APP_NAME $BRANCH $IMAGE $CMD
+	./docker-save $APP_NAME $BRANCH > $APP_NAME.$BRANCH.tar.gz
+done
+
+rm -rf $TMP_WORK_DIR > /dev/null
