@@ -1,0 +1,15 @@
+#!/bin/bash
+set -eo pipefail
+shopt -s nullglob
+
+REPO="$1"; BRANCH="$2"; IMAGE="$REPO/$BRANCH"
+
+id=$(cat | docker run -i -a stdin markhuot/carpenter /bin/bash -c "mkdir -p /app && tar -xC /app")
+test "$(docker wait $id)" -eq 0
+docker commit $id $IMAGE > /dev/null
+
+id=$(docker run -d $IMAGE /compiler/compile)
+docker attach $id
+test "$(docker wait $id)" -eq 0
+
+docker run -d $IMAGE /compiler/export /app

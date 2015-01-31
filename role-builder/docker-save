@@ -1,0 +1,7 @@
+#!/bin/bash
+set -eo pipefail
+#shopt -s nullglob
+
+REPO="$1"; BRANCH="$2"; IMAGE="$REPO/$BRANCH"
+
+docker save $IMAGE

@@ -1,0 +1,21 @@
+#!/bin/bash
+set -eo pipefail
+#shopt -s nullglob
+
+REPO="$1"; REV="$2"
+
+TMP_WORK_DIR=$(mktemp -d)
+chmod 755 $TMP_WORK_DIR
+unset GIT_DIR GIT_WORK_TREE
+# echo "-----> Cloning repository"
+git clone -q $REPO $TMP_WORK_DIR &> /dev/null
+pushd $TMP_WORK_DIR > /dev/null
+git config advice.detachedHead false
+git checkout $REV &> /dev/null
+# echo "-----> Updating submodules"
+git submodule update --init --recursive &> /dev/null
+find -name .git -prune -exec rm -rf {} \; > /dev/null
+# echo "-----> Creating archive"
+tar c .
+popd > /dev/null
+rm -rf $TMP_WORK_DIR > /dev/null
