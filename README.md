@@ -13,8 +13,7 @@ role-builder
 3. parse Stackfile
 	4. archive (`./archive PATH`)
 	4. buildstep (`./buildstep APP_NAME BRANCH`)
-	5. add ENV (`./docker-env APP_NAME BRANCH`)
-	6. docker export container (or docker save image) > image.tar.gz (`.docker-save APP_NAME BRANCH > app.tar.gz`)
+	6. save the image (`.docker-save APP_NAME BRANCH > app.tar.gz`)
 	7. cleanup (`./cleanup`)
 	8. add to "to-run" queue...
 
