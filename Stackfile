@@ -1,3 +1,4 @@
 [web]
 image=progrium/buildStep
-runArgs=-P 5000
+buildCmd=/builder/build
+runCmd=/start web
