@@ -7,18 +7,31 @@ set -eo pipefail
 REPO="$1"; REV="$2"; APP_NAME="$3"; BRANCH="$4";
 
 TMP_WORK_DIR=$(mktemp -d)
+
 ./git-clone $REPO $REV $TMP_WORK_DIR
-if [[ -e "$TMP_WORK_DIR/Stackfile" ]]; then
-	stackfile=$(cat "$TMP_WORK_DIR/Stackfile")
-else
-	stackfile="[web]\nimage=progrium/buildstep\ncmd=/build/builder\nmountPoint=/app"
+
+if [ ! -f "$TMP_WORK_DIR/Stackfile" ]; then
+	printf "[web]\nimage=progrium/buildstep\ncmd=/build/builder\nmountPoint=/app" >> "$TMP_WORK_DIR/Stackfile"
 fi
-for container in $(echo $stackfile | ./ini2arr.py --containers); do
+
+if [ ! -f "$TMP_WORK_DIR/.env" ]; then
+	printf "BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-php" >> "$TMP_WORK_DIR/.env"
+fi
+
+for container in $(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py --containers); do
 	echo "-----> Building $container"
 	IMAGE=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container image)
 	CMD=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container cmd)
-	./archive $TMP_WORK_DIR | ./buildstep $APP_NAME $BRANCH $IMAGE $CMD
+	MOUNT=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container mountPoint)
+	[ -z "${MOUNT:-}" ] && MOUNT="/app"
+	PORT=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container port)
+	[ -z "${PORT:-}" ] && PORT=5000
+	DATAONLY=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container dataOnly)
+
+	./archive $TMP_WORK_DIR | ./buildstep $APP_NAME $BRANCH $IMAGE $CMD $MOUNT
 	./docker-save $APP_NAME $BRANCH > $APP_NAME.$BRANCH.tar.gz
+
+	./add-to-host-queue $APP_NAME.$BRANCH.tar.gz $PORT $DATAONLY
 done
 
 rm -rf $TMP_WORK_DIR > /dev/null

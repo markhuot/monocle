@@ -2,9 +2,9 @@
 set -eo pipefail
 shopt -s nullglob
 
-REPO="$1"; BRANCH="$2"; IMAGE="$3"; CMD="$4"; IMAGE_NAME="$REPO/$BRANCH"
+REPO="$1"; BRANCH="$2"; IMAGE="$3"; CMD="$4"; MOUNT="$5"; IMAGE_NAME="$REPO/$BRANCH"
 
-id=$(cat | docker run -i -a stdin $IMAGE /bin/bash -c "mkdir -p /app && tar -xC /app")
+id=$(cat | docker run -i -a stdin $ARGS $IMAGE /bin/bash -c "mkdir -p $MOUNT && tar -xC $MOUNT")
 test "$(docker wait $id)" -eq 0
 docker commit $id $IMAGE_NAME > /dev/null
 
