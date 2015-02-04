@@ -14,7 +14,9 @@ else:
   try:
     print config.get(sys.argv[1], sys.argv[2])
   except:
-    print "No " + sys.argv[1] + ":" + sys.argv[2] + " defined, using defaults."
-  # for sec in config.sections():
-  #   for key, val in config.items(sec):
-  #       print '%s[%s]="%s"' % (sec, key, val)
+  	print ""
+
+# print "No " + sys.argv[1] + ":" + sys.argv[2] + " defined, using defaults."
+# for sec in config.sections():
+#   for key, val in config.items(sec):
+#       print '%s[%s]="%s"' % (sec, key, val)

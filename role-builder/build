@@ -3,7 +3,6 @@ set -eo pipefail
 #shopt -s nullglob
 
 # e.g. ./build /vagrant/debug/repo.git HEAD repo master
-
 REPO="$1"; REV="$2"; APP_NAME="$3"; BRANCH="$4";
 
 TMP_WORK_DIR=$(mktemp -d)
@@ -28,12 +27,12 @@ for container in $(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py --containers); d
 	[ -z "${MOUNT:-}" ] && MOUNT="/app"
 
 	./archive $TMP_WORK_DIR | ./buildstep $APP_NAME $BRANCH $IMAGE $BUILDCMD $MOUNT
-	./docker-save $APP_NAME $BRANCH > $APP_NAME.$BRANCH.tar.gz
+	./docker-save $APP_NAME $BRANCH
 
 	PORT=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container port)
 	[ -z "${PORT:-}" ] && PORT=5000
 	DATAONLY=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container dataOnly)
-	# nodejs add-to-host-queue.js $APP_NAME.$BRANCH.tar.gz $RUNCMD $PORT $DATAONLY
+	bundle exec ruby add-to-host-queue.rb "$APP_NAME.$BRANCH.tar.gz" "$RUNCMD" "$PORT" "$DATAONLY"
 done
 
 echo "DONE DONE DONE"

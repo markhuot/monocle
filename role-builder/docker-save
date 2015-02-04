@@ -4,4 +4,5 @@ set -eo pipefail
 
 REPO="$1"; BRANCH="$2"; IMAGE="$REPO/$BRANCH"
 
-docker save $IMAGE
+echo "-----> Saving Image"
+docker save $IMAGE > $REPO.$BRANCH.tar.gz

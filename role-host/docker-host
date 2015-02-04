@@ -1,0 +1,11 @@
+#!/bin/bash
+set -eo pipefail
+#shopt -s nullglob
+
+TAR="$1"; RUNCMD="$2"; PORT="$3"; DATA="$4";
+
+id=$(cat $TAR | sudo docker import - repo.master:new)
+echo "WEE: $id"
+
+id=$(docker run -d -p $PORT -e PORT=$PORT repo.master:new /bin/bash -c "$RUNCMD")
+echo "ID: $id"
