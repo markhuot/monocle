@@ -1,5 +1,0 @@
-#!/bin/bash
-set -eo pipefail
-shopt -s nullglob
-
-TAR="$1"; PORT="$2"; DATAONLY="$3"

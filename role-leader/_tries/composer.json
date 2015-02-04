@@ -1,0 +1,10 @@
+{
+    "require": {
+        "symfony/http-foundation": "~2.6",
+        "illuminate/queue": "~5.0-dev",
+        "pda/pheanstalk": "~3.0",
+        "noahbuscher/macaw": "dev-master",
+        "illuminate/encryption": "~5.1-dev"
+    },
+    "minimum-stability": "dev"
+}

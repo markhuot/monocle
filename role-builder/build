@@ -11,7 +11,7 @@ TMP_WORK_DIR=$(mktemp -d)
 ./git-clone $REPO $REV $TMP_WORK_DIR
 
 if [ ! -f "$TMP_WORK_DIR/Stackfile" ]; then
-	printf "[web]\nimage=progrium/buildstep\ncmd=/build/builder\nmountPoint=/app" >> "$TMP_WORK_DIR/Stackfile"
+	printf "[web]\nimage=progrium/buildstep\nbuildCmd=/build/builder\nrunCmd=/start web\nmountPoint=/app" >> "$TMP_WORK_DIR/Stackfile"
 fi
 
 if [ ! -f "$TMP_WORK_DIR/.env" ]; then
@@ -20,18 +20,22 @@ fi
 
 for container in $(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py --containers); do
 	echo "-----> Building $container"
+
 	IMAGE=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container image)
-	CMD=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container cmd)
+	BUILDCMD=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container buildCmd)
+	RUNCMD=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container runCmd)
 	MOUNT=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container mountPoint)
 	[ -z "${MOUNT:-}" ] && MOUNT="/app"
+
+	./archive $TMP_WORK_DIR | ./buildstep $APP_NAME $BRANCH $IMAGE $BUILDCMD $MOUNT
+	./docker-save $APP_NAME $BRANCH > $APP_NAME.$BRANCH.tar.gz
+
 	PORT=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container port)
 	[ -z "${PORT:-}" ] && PORT=5000
 	DATAONLY=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container dataOnly)
-
-	./archive $TMP_WORK_DIR | ./buildstep $APP_NAME $BRANCH $IMAGE $CMD $MOUNT
-	./docker-save $APP_NAME $BRANCH > $APP_NAME.$BRANCH.tar.gz
-
-	./add-to-host-queue $APP_NAME.$BRANCH.tar.gz $PORT $DATAONLY
+	# nodejs add-to-host-queue.js $APP_NAME.$BRANCH.tar.gz $RUNCMD $PORT $DATAONLY
 done
+
+echo "DONE DONE DONE"
 
 rm -rf $TMP_WORK_DIR > /dev/null

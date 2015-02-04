@@ -1,0 +1,10 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    beaneater (0.3.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  beaneater

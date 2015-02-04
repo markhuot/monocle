@@ -2,14 +2,17 @@
 set -eo pipefail
 shopt -s nullglob
 
-REPO="$1"; BRANCH="$2"; IMAGE="$3"; CMD="$4"; MOUNT="$5"; IMAGE_NAME="$REPO/$BRANCH"
+REPO="$1"; BRANCH="$2"; IMAGE="$3"; BUILDCMD="$4"; MOUNT="$5"; IMAGE_NAME="$REPO/$BRANCH"
 
+# copy the application into the container
 id=$(cat | docker run -i -a stdin $ARGS $IMAGE /bin/bash -c "mkdir -p $MOUNT && tar -xC $MOUNT")
 test "$(docker wait $id)" -eq 0
 docker commit $id $IMAGE_NAME > /dev/null
 
-if [[ $CMD ]]; then
-	id=$(docker run -d $IMAGE_NAME $CMD)
+# if a build process is required run the command, and commit the
+# container to store changes
+if [[ $BUILDCMD ]]; then
+	id=$(docker run -d $IMAGE_NAME $BUILDCMD)
 	docker attach $id
 	test "$(docker wait $id)" -eq 0
 	docker commit $id $IMAGE_NAME > /dev/null

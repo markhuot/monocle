@@ -1,5 +1,3 @@
-var amqp = require('amqp');
-var amqpConnection = amqp.createConnection({ host: 'dev.rabbitmq.com' });
 var http = require('http');
 http.createServer(function(req, res)
 {
@@ -9,7 +7,7 @@ http.createServer(function(req, res)
             body += data;
         });
         req.on('end', function () {
-            amqpConnection.publish('to-build', body);
+            //ironium.queueJob("to-build", {"test":"this"});
         });
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.end('{"success"}'+"\n");

@@ -6,11 +6,12 @@ connection.on('ready', function () {
   connection.queue('to-host', function (q) {
       q.bind('#');
       q.subscribe(function (message) {
-        spawn('./docker-start repo branch').stdout.on('data', function(chunk) {
-          console.log(chunk.toString());
-        }).stderr.on('data', function(chunk) {
-          console.log(chunk.toString());
-        });
+        console.log('HOST MESSAGE', message);
+        // spawn('./docker-start repo branch').stdout.on('data', function(chunk) {
+        //   console.log(chunk.toString());
+        // }).stderr.on('data', function(chunk) {
+        //   console.log(chunk.toString());
+        // });
       });
   });
 });
