@@ -18,5 +18,5 @@ post '/' do
   tube.put job, :pri => 5
   beanstalk.close
 
-  { :status => 200, :message => 'Job Accepted' }.to_json
+  { :status => 200, :message => 'Job Accepted' }.to_json + "\n"
 end

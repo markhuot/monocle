@@ -2,8 +2,12 @@
 set -eo pipefail
 #shopt -s nullglob
 
+echo "-----> Cleaning up"
+
 # delete all non-running container
+echo "       Removing non-running containers"
 docker ps -a | grep 'Exit' | awk '{print $1}' | xargs docker rm &> /dev/null &
 
 # delete unused images
+echo "       Removing unused images"
 docker images | grep '<none>' | awk '{print $3}' | xargs docker rmi &> /dev/null &

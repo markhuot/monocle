@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cd role-leader
+ruby ./lead.rb &
+echo $! >> ../role-leader.pid
+cd ..
+
+cd role-builder
+ruby ./build.rb &
+echo $! >> ../role-builder.pid
+cd ..
+
+cd role-host
+ruby ./host.rb &
+echo $! >> ../role-host.pid
+cd ..
+
+
+# curl -x POST --data '{"repo":"/vagrant/debug/repo.git","rev":"HEAD","name":"repo","branch":"master"}' http://localhost

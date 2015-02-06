@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat role-leader.pid | xargs kill
+rm -f role-leader.pid
+
+cat role-builder.pid | xargs kill
+rm -f role-builder.pid
+
+cat role-host.pid | xargs kill
+rm -f role-host.pid

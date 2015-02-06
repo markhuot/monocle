@@ -1,3 +1,0 @@
-#!/bin/bash
-
-curl -x POST --data '{"repo":"/vagrant/debug/repo.git","rev":"HEAD","name":"repo","branch":"master"}' http://localhost

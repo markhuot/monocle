@@ -9,11 +9,18 @@ id=$(cat | docker run -i -a stdin $ARGS $IMAGE /bin/bash -c "mkdir -p $MOUNT && 
 test "$(docker wait $id)" -eq 0
 docker commit $id $IMAGE_NAME > /dev/null
 
-# if a build process is required run the command, and commit the
-# container to store changes
+# if a build process is required run the command on the container
 if [[ $BUILDCMD ]]; then
 	id=$(docker run -d $IMAGE_NAME $BUILDCMD)
 	docker attach $id
 	test "$(docker wait $id)" -eq 0
 	docker commit $id $IMAGE_NAME > /dev/null
 fi
+
+echo "-----> Container built: $id"
+
+echo "-----> Saving Image"
+docker save $IMAGE_NAME > $REPO.$BRANCH.tar.gz
+
+# echo "-----> Removing Build Artifacts"
+# docker rmi $IMAGE_NAME:latest

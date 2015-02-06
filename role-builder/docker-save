@@ -2,7 +2,7 @@
 set -eo pipefail
 #shopt -s nullglob
 
-REPO="$1"; BRANCH="$2"; IMAGE="$REPO/$BRANCH"
+REPO="$1"; BRANCH="$2"; IMAGE_NAME="$REPO/$BRANCH"
 
 echo "-----> Saving Image"
-docker save $IMAGE > $REPO.$BRANCH.tar.gz
+docker save $IMAGE_NAME > $REPO.$BRANCH.tar.gz

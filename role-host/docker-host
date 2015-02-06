@@ -2,10 +2,14 @@
 set -eo pipefail
 #shopt -s nullglob
 
-TAR="$1"; RUNCMD="$2"; PORT="$3"; DATA="$4";
+TAR="$1"; APP_NAME="$2"; BRANCH="$3"; RUNCMD="$4"; PORT="$5"; DATA="$6"
 
-id=$(cat $TAR | sudo docker import - repo.master:new)
-echo "WEE: $id"
+echo "-----> Importing archive for $APP_NAME/$BRANCH:latest"
+id=$(cat ../role-builder/$TAR | docker import - $APP_NAME/$BRANCH:latest)
+echo "       Archive import succeeded: $id"
 
-id=$(docker run -d -p $PORT -e PORT=$PORT repo.master:new /bin/bash -c "$RUNCMD")
-echo "ID: $id"
+id=$(docker run -d -e PORT=$PORT $APP_NAME/$BRANCH:latest /bin/bash -c "$RUNCMD")
+ipaddr=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $id)
+echo "-----> Started container"
+echo "       id: $id"
+echo "       ip: $ipaddr"
