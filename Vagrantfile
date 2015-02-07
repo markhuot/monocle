@@ -4,6 +4,7 @@
 $script = <<SCRIPT
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
+
 apt-get install -q -y docker.io
 sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
 sudo sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
@@ -11,6 +12,9 @@ sudo groupadd docker
 sudo gpasswd -a ${USER} docker
 sudo service docker.io restart
 newgrp docker
+
+# redis
+# hipache
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!

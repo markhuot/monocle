@@ -5,11 +5,18 @@ set -eo pipefail
 TAR="$1"; APP_NAME="$2"; BRANCH="$3"; RUNCMD="$4"; PORT="$5"; DATA="$6"
 
 echo "-----> Importing archive for $APP_NAME/$BRANCH:latest"
-id=$(cat ../role-builder/$TAR | docker import - $APP_NAME/$BRANCH:latest)
-echo "       Archive import succeeded: $id"
+id=$(docker load -i ../role-builder/$TAR)
 
 id=$(docker run -d -e PORT=$PORT $APP_NAME/$BRANCH:latest /bin/bash -c "$RUNCMD")
 ipaddr=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $id)
 echo "-----> Started container"
 echo "       id: $id"
 echo "       ip: $ipaddr"
+
+echo "-----> Adding to load balancer"
+if [ "$(redis-cli llen frontend:$APP_NAME.$BRANCH.cogclient.dev)" -eq "0" ]; then
+	redis-cli rpush frontend:$APP_NAME.$BRANCH.cogclient.dev mywebsite
+fi
+
+redis-cli lrem frontend:$APP_NAME.$BRANCH.cogclient.dev -1 "http://$ipaddr:$PORT"
+redis-cli rpush frontend:$APP_NAME.$BRANCH.cogclient.dev "http://$ipaddr:$PORT"

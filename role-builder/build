@@ -10,7 +10,7 @@ TMP_WORK_DIR=$(mktemp -d)
 ./git-clone $REPO $REV $TMP_WORK_DIR
 
 if [ ! -f "$TMP_WORK_DIR/Stackfile" ]; then
-	printf "[web]\nimage=progrium/buildstep\nbuildCmd=/build/builder\nrunCmd=/start web\nmountPoint=/app" >> "$TMP_WORK_DIR/Stackfile"
+	printf "[web]\nimage=progrium/buildstep\nbuildCmd=/build/builder\nrunCmd=/start web\nmountPoint=/app\nport=80" >> "$TMP_WORK_DIR/Stackfile"
 fi
 
 if [ ! -f "$TMP_WORK_DIR/.env" ]; then
@@ -33,7 +33,7 @@ for container in $(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py --containers); d
 	[ -z "${PORT:-}" ] && PORT=5000
 	DATAONLY=$(cat "$TMP_WORK_DIR/Stackfile" | ./ini2arr.py $container dataOnly)
 	echo "-----> Asking for a host to run $APP_NAME/$BRANCH"
-	bundle exec ruby add-to-host-queue.rb "$APP_NAME.$BRANCH.tar.gz" "$APP_NAME" "$BRANCH" "$RUNCMD" "$PORT" "$DATAONLY"
+	bundle exec ruby add-to-host-queue.rb "$APP_NAME.$BRANCH.tar" "$APP_NAME" "$BRANCH" "$RUNCMD" "$PORT" "$DATAONLY"
 done
 
 rm -rf $TMP_WORK_DIR > /dev/null

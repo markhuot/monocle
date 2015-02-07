@@ -20,7 +20,4 @@ fi
 echo "-----> Container built: $id"
 
 echo "-----> Saving Image"
-docker save $IMAGE_NAME > $REPO.$BRANCH.tar.gz
-
-# echo "-----> Removing Build Artifacts"
-# docker rmi $IMAGE_NAME:latest
+docker save $IMAGE_NAME > $REPO.$BRANCH.tar
